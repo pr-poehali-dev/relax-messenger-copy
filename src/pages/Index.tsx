@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import Icon from "@/components/ui/icon";
+import AuthScreen, { getSession, clearSession } from "@/components/AuthScreen";
 
 type Message = {
   id: number;
@@ -121,6 +122,7 @@ function Avatar({ char, color, size = 40, online }: { char: string; color: strin
 }
 
 export default function Index() {
+  const [session, setSession] = useState<{ username: string; phone: string } | null>(() => getSession());
   const [chats, setChats] = useState<Chat[]>(CHATS);
   const [activeChatId, setActiveChatId] = useState<number>(1);
   const [input, setInput] = useState("");
@@ -137,6 +139,10 @@ export default function Index() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeChatId, activeChat?.messages.length]);
+
+  if (!session) {
+    return <AuthScreen onAuth={(user) => setSession(user)} />;
+  }
 
   function selectChat(id: number) {
     setActiveChatId(id);
@@ -278,13 +284,17 @@ export default function Index() {
 
         {/* My profile */}
         <div className="px-5 py-4 border-t border-[#e2d9cc] flex items-center gap-3 flex-shrink-0">
-          <Avatar char="Я" color="#7a8ea8" size={36} online />
+          <Avatar char={session.username[0]?.toUpperCase() || "Я"} color="#7a8ea8" size={36} online />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-[#3d3530] leading-none mb-0.5">Мой профиль</p>
+            <p className="text-sm font-medium text-[#3d3530] leading-none mb-0.5 truncate">{session.username}</p>
             <p className="text-[11px] text-[#6b8f71]">В сети</p>
           </div>
-          <button className="w-8 h-8 rounded-xl hover:bg-[#ede7dc] flex items-center justify-center transition-colors">
-            <Icon name="Settings" size={15} className="text-[#a09387]" />
+          <button
+            onClick={() => { clearSession(); setSession(null); }}
+            title="Выйти"
+            className="w-8 h-8 rounded-xl hover:bg-red-50 flex items-center justify-center transition-colors group"
+          >
+            <Icon name="LogOut" size={15} className="text-[#a09387] group-hover:text-red-400 transition-colors" />
           </button>
         </div>
       </aside>
