@@ -22,85 +22,7 @@ type Chat = {
   messages: Message[];
 };
 
-const CHATS: Chat[] = [
-  {
-    id: 1,
-    name: "Аня Морозова",
-    avatar: "А",
-    color: "#6b8f71",
-    lastMsg: "Как прошёл твой день? 🌿",
-    time: "14:32",
-    unread: 2,
-    online: true,
-    messages: [
-      { id: 1, from: "other", text: "Привет! Как ты? 🌸", time: "14:20" },
-      { id: 2, from: "me", text: "Привет! Всё хорошо, спасибо. Читаю книгу на балконе", time: "14:22", read: true },
-      { id: 3, from: "other", text: "Звучит уютно 😊 Что за книга?", time: "14:25" },
-      { id: 4, from: "me", text: "«Норвежский лес» Мураками. Читал когда-нибудь?", time: "14:27", read: true },
-      { id: 5, from: "other", text: "Как прошёл твой день? 🌿", time: "14:32" },
-    ],
-  },
-  {
-    id: 2,
-    name: "Миша Волков",
-    avatar: "М",
-    color: "#8a7d72",
-    lastMsg: "Встретимся в кафе в 18:00?",
-    time: "13:15",
-    unread: 0,
-    online: true,
-    messages: [
-      { id: 1, from: "other", text: "Слушай, ты свободен сегодня вечером?", time: "12:50" },
-      { id: 2, from: "me", text: "Да, вроде бы. А что?", time: "12:55", read: true },
-      { id: 3, from: "other", text: "Встретимся в кафе в 18:00?", time: "13:15" },
-    ],
-  },
-  {
-    id: 3,
-    name: "Семья 🏡",
-    avatar: "С",
-    color: "#c9956e",
-    lastMsg: "Мама: Приедете на выходных?",
-    time: "11:40",
-    unread: 1,
-    online: false,
-    messages: [
-      { id: 1, from: "other", text: "Всем привет! Как дела у всех? ❤️", time: "10:00" },
-      { id: 2, from: "me", text: "Всё отлично! Работы много, но справляюсь 😊", time: "10:30", read: true },
-      { id: 3, from: "other", text: "Мама: Приедете на выходных?", time: "11:40" },
-    ],
-  },
-  {
-    id: 4,
-    name: "Дима Серов",
-    avatar: "Д",
-    color: "#7a8ea8",
-    lastMsg: "Проект готов, отправил на почту",
-    time: "Вчера",
-    unread: 0,
-    online: false,
-    messages: [
-      { id: 1, from: "other", text: "Как там дела с дизайном?", time: "Вчера" },
-      { id: 2, from: "me", text: "Почти готово, доделываю мобильную версию", time: "Вчера", read: true },
-      { id: 3, from: "other", text: "Проект готов, отправил на почту", time: "Вчера" },
-    ],
-  },
-  {
-    id: 5,
-    name: "Катя Лесная",
-    avatar: "К",
-    color: "#9b7eb8",
-    lastMsg: "Спасибо за рецепт! Попробую 🫶",
-    time: "Вчера",
-    unread: 0,
-    online: false,
-    messages: [
-      { id: 1, from: "me", text: "Держи рецепт овсяного печенья, о котором говорили", time: "Вчера", read: true },
-      { id: 2, from: "other", text: "Ооо, спасибо! Выглядит вкусно", time: "Вчера" },
-      { id: 3, from: "other", text: "Спасибо за рецепт! Попробую 🫶", time: "Вчера" },
-    ],
-  },
-];
+const CHATS: Chat[] = [];
 
 function Avatar({ char, color, size = 40, online }: { char: string; color: string; size?: number; online?: boolean }) {
   return (
@@ -310,132 +232,156 @@ export default function Index() {
       {/* Main chat area */}
       <main className="flex-1 flex flex-col min-w-0">
 
-        {/* Chat header */}
-        <header className="flex-shrink-0 bg-[#f8f4ed] border-b border-[#e2d9cc] px-5 py-3.5 flex items-center gap-3">
-          <button
-            className="md:hidden w-9 h-9 rounded-xl hover:bg-[#ede7dc] flex items-center justify-center transition-colors"
-            onClick={() => setSidebarOpen(true)}
+        {!activeChat ? (
+          /* Пустой экран — нет выбранного чата */
+          <div
+            className="flex-1 flex flex-col items-center justify-center gap-4"
+            style={{ background: "linear-gradient(180deg, #ede8de 0%, #f0ebe0 100%)" }}
           >
-            <Icon name="Menu" size={18} className="text-[#6b8f71]" />
-          </button>
-
-          <Avatar char={activeChat.avatar} color={activeChat.color} size={40} online={activeChat.online} />
-
-          <div className="flex-1 min-w-0">
-            <h2 className="text-[#3d3530] font-semibold text-sm leading-none mb-1">{activeChat.name}</h2>
-            <p className="text-[11px] text-[#6b8f71]">
-              {activeChat.online ? "в сети" : "был(а) недавно"}
+            <button
+              className="md:hidden absolute top-4 left-4 w-9 h-9 rounded-xl bg-[#f8f4ed] border border-[#e2d9cc] flex items-center justify-center"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Icon name="Menu" size={18} className="text-[#6b8f71]" />
+            </button>
+            <div className="w-16 h-16 rounded-2xl bg-[#6b8f71]/12 flex items-center justify-center mb-2">
+              <span className="text-3xl">💬</span>
+            </div>
+            <p className="text-[#3d3530] font-medium text-base">Нет чатов</p>
+            <p className="text-[#a09387] text-sm text-center max-w-xs leading-relaxed">
+              Здесь будут ваши диалоги. Начните общение, найдя собеседника по номеру телефона.
             </p>
           </div>
-
-          <div className="flex items-center gap-1">
-            <button className="w-9 h-9 rounded-xl hover:bg-[#ede7dc] flex items-center justify-center transition-colors">
-              <Icon name="Phone" size={16} className="text-[#8a7d72]" />
-            </button>
-            <button className="w-9 h-9 rounded-xl hover:bg-[#ede7dc] flex items-center justify-center transition-colors">
-              <Icon name="Video" size={16} className="text-[#8a7d72]" />
-            </button>
-            <button className="w-9 h-9 rounded-xl hover:bg-[#ede7dc] flex items-center justify-center transition-colors">
-              <Icon name="MoreHorizontal" size={16} className="text-[#8a7d72]" />
-            </button>
-          </div>
-        </header>
-
-        {/* Messages area */}
-        <div
-          className="flex-1 overflow-y-auto px-4 md:px-10 py-6 space-y-1.5"
-          style={{ background: "linear-gradient(180deg, #ede8de 0%, #f0ebe0 100%)" }}
-        >
-          <div className="flex items-center gap-3 mb-5">
-            <div className="flex-1 h-px bg-[#d8d0c4]" />
-            <span className="text-[11px] text-[#b0a498] px-2 bg-[#e8e1d4] rounded-full py-0.5">Сегодня</span>
-            <div className="flex-1 h-px bg-[#d8d0c4]" />
-          </div>
-
-          {activeChat.messages.map((msg, i) => {
-            const isMe = msg.from === "me";
-            const prevMsg = activeChat.messages[i - 1];
-            const showAvatar = !isMe && (!prevMsg || prevMsg.from !== "other");
-
-            return (
-              <div
-                key={msg.id}
-                className={`flex items-end gap-2 ${isMe ? "justify-end" : "justify-start"}`}
+        ) : (
+          <>
+            {/* Chat header */}
+            <header className="flex-shrink-0 bg-[#f8f4ed] border-b border-[#e2d9cc] px-5 py-3.5 flex items-center gap-3">
+              <button
+                className="md:hidden w-9 h-9 rounded-xl hover:bg-[#ede7dc] flex items-center justify-center transition-colors"
+                onClick={() => setSidebarOpen(true)}
               >
-                {!isMe && (
-                  <div className="w-7 flex-shrink-0 self-end mb-5">
-                    {showAvatar && (
-                      <Avatar char={activeChat.avatar} color={activeChat.color} size={28} />
-                    )}
-                  </div>
-                )}
+                <Icon name="Menu" size={18} className="text-[#6b8f71]" />
+              </button>
 
-                <div className="max-w-[70%] md:max-w-[55%]">
-                  <div
-                    className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm
-                      ${isMe
-                        ? "bg-[#6b8f71] text-white rounded-br-md"
-                        : "bg-white text-[#3d3530] rounded-bl-md"
-                      }`}
-                    style={{ wordBreak: "break-word" }}
-                  >
-                    {msg.text}
-                  </div>
-                  <div className={`flex items-center gap-1 mt-1 ${isMe ? "justify-end" : "justify-start"}`}>
-                    <span className="text-[10px] text-[#b0a498]">{msg.time}</span>
-                    {isMe && (
-                      <Icon
-                        name={msg.read ? "CheckCheck" : "Check"}
-                        size={11}
-                        className={msg.read ? "text-[#6b8f71]" : "text-[#b0a498]"}
-                      />
-                    )}
-                  </div>
-                </div>
+              <Avatar char={activeChat.avatar} color={activeChat.color} size={40} online={activeChat.online} />
+
+              <div className="flex-1 min-w-0">
+                <h2 className="text-[#3d3530] font-semibold text-sm leading-none mb-1">{activeChat.name}</h2>
+                <p className="text-[11px] text-[#6b8f71]">
+                  {activeChat.online ? "в сети" : "был(а) недавно"}
+                </p>
               </div>
-            );
-          })}
-          <div ref={messagesEndRef} />
-        </div>
 
-        {/* Input */}
-        <div className="flex-shrink-0 bg-[#f8f4ed] border-t border-[#e2d9cc] px-4 md:px-6 py-4">
-          <div className="flex items-end gap-3 bg-white rounded-2xl px-4 py-3 border border-[#e8e0d4] shadow-sm">
-            <button className="flex-shrink-0 mb-0.5">
-              <Icon name="Paperclip" size={17} className="text-[#a09387] hover:text-[#6b8f71] transition-colors" />
-            </button>
+              <div className="flex items-center gap-1">
+                <button className="w-9 h-9 rounded-xl hover:bg-[#ede7dc] flex items-center justify-center transition-colors">
+                  <Icon name="Phone" size={16} className="text-[#8a7d72]" />
+                </button>
+                <button className="w-9 h-9 rounded-xl hover:bg-[#ede7dc] flex items-center justify-center transition-colors">
+                  <Icon name="Video" size={16} className="text-[#8a7d72]" />
+                </button>
+                <button className="w-9 h-9 rounded-xl hover:bg-[#ede7dc] flex items-center justify-center transition-colors">
+                  <Icon name="MoreHorizontal" size={16} className="text-[#8a7d72]" />
+                </button>
+              </div>
+            </header>
 
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKey}
-              placeholder="Напишите сообщение..."
-              rows={1}
-              className="flex-1 resize-none bg-transparent text-sm text-[#3d3530] placeholder-[#b0a498] outline-none leading-relaxed max-h-28"
-              style={{ scrollbarWidth: "none" }}
-            />
-
-            <button className="flex-shrink-0 mb-0.5">
-              <Icon name="Smile" size={17} className="text-[#a09387] hover:text-[#6b8f71] transition-colors" />
-            </button>
-
-            <button
-              onClick={sendMessage}
-              disabled={!input.trim()}
-              className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 mb-0.5
-                ${input.trim()
-                  ? "bg-[#6b8f71] hover:bg-[#5a7a60] shadow-md shadow-[#6b8f71]/30"
-                  : "bg-[#e8e0d4]"
-                }`}
+            {/* Messages area */}
+            <div
+              className="flex-1 overflow-y-auto px-4 md:px-10 py-6 space-y-1.5"
+              style={{ background: "linear-gradient(180deg, #ede8de 0%, #f0ebe0 100%)" }}
             >
-              <Icon name="Send" size={15} className={input.trim() ? "text-white" : "text-[#b0a498]"} />
-            </button>
-          </div>
-          <p className="text-center text-[10px] text-[#c9bdb2] mt-2">
-            Enter — отправить · Shift+Enter — новая строка
-          </p>
-        </div>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex-1 h-px bg-[#d8d0c4]" />
+                <span className="text-[11px] text-[#b0a498] px-2 bg-[#e8e1d4] rounded-full py-0.5">Сегодня</span>
+                <div className="flex-1 h-px bg-[#d8d0c4]" />
+              </div>
+
+              {activeChat.messages.map((msg, i) => {
+                const isMe = msg.from === "me";
+                const prevMsg = activeChat.messages[i - 1];
+                const showAvatar = !isMe && (!prevMsg || prevMsg.from !== "other");
+
+                return (
+                  <div
+                    key={msg.id}
+                    className={`flex items-end gap-2 ${isMe ? "justify-end" : "justify-start"}`}
+                  >
+                    {!isMe && (
+                      <div className="w-7 flex-shrink-0 self-end mb-5">
+                        {showAvatar && (
+                          <Avatar char={activeChat.avatar} color={activeChat.color} size={28} />
+                        )}
+                      </div>
+                    )}
+
+                    <div className="max-w-[70%] md:max-w-[55%]">
+                      <div
+                        className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm
+                          ${isMe
+                            ? "bg-[#6b8f71] text-white rounded-br-md"
+                            : "bg-white text-[#3d3530] rounded-bl-md"
+                          }`}
+                        style={{ wordBreak: "break-word" }}
+                      >
+                        {msg.text}
+                      </div>
+                      <div className={`flex items-center gap-1 mt-1 ${isMe ? "justify-end" : "justify-start"}`}>
+                        <span className="text-[10px] text-[#b0a498]">{msg.time}</span>
+                        {isMe && (
+                          <Icon
+                            name={msg.read ? "CheckCheck" : "Check"}
+                            size={11}
+                            className={msg.read ? "text-[#6b8f71]" : "text-[#b0a498]"}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input */}
+            <div className="flex-shrink-0 bg-[#f8f4ed] border-t border-[#e2d9cc] px-4 md:px-6 py-4">
+              <div className="flex items-end gap-3 bg-white rounded-2xl px-4 py-3 border border-[#e8e0d4] shadow-sm">
+                <button className="flex-shrink-0 mb-0.5">
+                  <Icon name="Paperclip" size={17} className="text-[#a09387] hover:text-[#6b8f71] transition-colors" />
+                </button>
+
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKey}
+                  placeholder="Напишите сообщение..."
+                  rows={1}
+                  className="flex-1 resize-none bg-transparent text-sm text-[#3d3530] placeholder-[#b0a498] outline-none leading-relaxed max-h-28"
+                  style={{ scrollbarWidth: "none" }}
+                />
+
+                <button className="flex-shrink-0 mb-0.5">
+                  <Icon name="Smile" size={17} className="text-[#a09387] hover:text-[#6b8f71] transition-colors" />
+                </button>
+
+                <button
+                  onClick={sendMessage}
+                  disabled={!input.trim()}
+                  className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 mb-0.5
+                    ${input.trim()
+                      ? "bg-[#6b8f71] hover:bg-[#5a7a60] shadow-md shadow-[#6b8f71]/30"
+                      : "bg-[#e8e0d4]"
+                    }`}
+                >
+                  <Icon name="Send" size={15} className={input.trim() ? "text-white" : "text-[#b0a498]"} />
+                </button>
+              </div>
+              <p className="text-center text-[10px] text-[#c9bdb2] mt-2">
+                Enter — отправить · Shift+Enter — новая строка
+              </p>
+            </div>
+          </>
+        )}
       </main>
     </div>
   );
