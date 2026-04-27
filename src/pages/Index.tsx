@@ -19,10 +19,44 @@ type Chat = {
   time: string;
   unread: number;
   online: boolean;
+  verified?: boolean;
+  favorite?: boolean;
   messages: Message[];
 };
 
-const CHATS: Chat[] = [];
+const SYSTEM_CHATS: Chat[] = [
+  {
+    id: -1,
+    name: "Избранное",
+    avatar: "★",
+    color: "#f5a623",
+    lastMsg: "Сохраняйте сюда важные сообщения",
+    time: "",
+    unread: 0,
+    online: false,
+    favorite: true,
+    messages: [],
+  },
+  {
+    id: -2,
+    name: "Relax",
+    avatar: "🌿",
+    color: "#6b8f71",
+    lastMsg: "Добро пожаловать в Relax — Мессенджер! 🌿",
+    time: "сейчас",
+    unread: 1,
+    online: true,
+    verified: true,
+    messages: [
+      {
+        id: 1,
+        from: "other",
+        text: "Привет! Добро пожаловать в Relax — Мессенджер 🌿\n\nЗдесь вы можете общаться с друзьями и близкими в тихой, уютной атмосфере без лишнего шума.\n\nЭто официальный канал приложения.",
+        time: "сейчас",
+      },
+    ],
+  },
+];
 
 function Avatar({ char, color, size = 40, online }: { char: string; color: string; size?: number; online?: boolean }) {
   return (
@@ -46,15 +80,16 @@ function Avatar({ char, color, size = 40, online }: { char: string; color: strin
 export default function Index() {
   const [session, setSession] = useState<{ username: string; phone: string } | null>(() => getSession());
   const [chats, setChats] = useState<Chat[]>(CHATS);
-  const [activeChatId, setActiveChatId] = useState<number>(1);
+  const [activeChatId, setActiveChatId] = useState<number>(-2);
   const [input, setInput] = useState("");
   const [search, setSearch] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const activeChat = chats.find((c) => c.id === activeChatId)!;
-  const filteredChats = chats.filter((c) =>
+  const allChats = [...SYSTEM_CHATS, ...chats];
+  const activeChat = allChats.find((c) => c.id === activeChatId);
+  const filteredChats = allChats.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -185,10 +220,27 @@ export default function Index() {
               className={`w-full flex items-center gap-3 px-3 py-3 rounded-2xl transition-all duration-150 text-left
                 ${activeChatId === chat.id ? "bg-[#6b8f71]/10" : "hover:bg-[#ede7dc]/80"}`}
             >
-              <Avatar char={chat.avatar} color={chat.color} size={46} online={chat.online} />
+              {/* Avatar with star badge for favorite */}
+              <div className="relative flex-shrink-0">
+                <Avatar char={chat.avatar} color={chat.color} size={46} online={chat.online} />
+                {chat.favorite && (
+                  <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#f5a623] border-2 border-[#f8f4ed] flex items-center justify-center text-[8px]">
+                    ★
+                  </span>
+                )}
+              </div>
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-sm font-medium text-[#3d3530] truncate">{chat.name}</span>
+                  <div className="flex items-center gap-1 min-w-0">
+                    <span className="text-sm font-medium text-[#3d3530] truncate">{chat.name}</span>
+                    {chat.verified && (
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="flex-shrink-0" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="7" cy="7" r="7" fill="#3B82F6"/>
+                        <path d="M4 7l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </div>
                   <span className="text-[10px] text-[#b0a498] ml-2 flex-shrink-0">{chat.time}</span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -266,9 +318,17 @@ export default function Index() {
               <Avatar char={activeChat.avatar} color={activeChat.color} size={40} online={activeChat.online} />
 
               <div className="flex-1 min-w-0">
-                <h2 className="text-[#3d3530] font-semibold text-sm leading-none mb-1">{activeChat.name}</h2>
+                <div className="flex items-center gap-1 mb-1">
+                  <h2 className="text-[#3d3530] font-semibold text-sm leading-none">{activeChat.name}</h2>
+                  {activeChat.verified && (
+                    <svg width="15" height="15" viewBox="0 0 14 14" fill="none" className="flex-shrink-0" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="7" cy="7" r="7" fill="#3B82F6"/>
+                      <path d="M4 7l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </div>
                 <p className="text-[11px] text-[#6b8f71]">
-                  {activeChat.online ? "в сети" : "был(а) недавно"}
+                  {activeChat.verified ? "Официальный канал" : activeChat.favorite ? "Ваши сохранённые сообщения" : activeChat.online ? "в сети" : "был(а) недавно"}
                 </p>
               </div>
 
