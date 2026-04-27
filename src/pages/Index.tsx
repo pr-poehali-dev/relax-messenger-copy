@@ -79,7 +79,7 @@ function Avatar({ char, color, size = 40, online }: { char: string; color: strin
 
 export default function Index() {
   const [session, setSession] = useState<{ username: string; phone: string } | null>(() => getSession());
-  const [chats, setChats] = useState<Chat[]>(CHATS);
+  const [chats, setChats] = useState<Chat[]>([]);
   const [activeChatId, setActiveChatId] = useState<number>(-2);
   const [input, setInput] = useState("");
   const [search, setSearch] = useState("");
